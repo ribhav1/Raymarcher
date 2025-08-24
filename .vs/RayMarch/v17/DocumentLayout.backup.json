@@ -3,12 +3,20 @@
   "WorkspaceRootPath": "C:\\Users\\ribha\\Downloads\\Projects\\RayMarch\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{36087822-3E30-0982-8D2A-D21D073001B8}|RayMarch.csproj|c:\\users\\ribha\\downloads\\projects\\raymarch\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{36087822-3E30-0982-8D2A-D21D073001B8}|RayMarch.csproj|solutionrelative:program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{36087822-3E30-0982-8D2A-D21D073001B8}|RayMarch.csproj|c:\\users\\ribha\\downloads\\projects\\raymarch\\renderquad.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{36087822-3E30-0982-8D2A-D21D073001B8}|RayMarch.csproj|solutionrelative:renderquad.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{36087822-3E30-0982-8D2A-D21D073001B8}|RayMarch.csproj|c:\\users\\ribha\\downloads\\projects\\raymarch\\raymarchwindow.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{36087822-3E30-0982-8D2A-D21D073001B8}|RayMarch.csproj|solutionrelative:raymarchwindow.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{36087822-3E30-0982-8D2A-D21D073001B8}|RayMarch.csproj|c:\\users\\ribha\\downloads\\projects\\raymarch\\shaders\\raymarch.frag||{8B382828-6202-11D1-8870-0000F87579D2}",
       "RelativeMoniker": "D:0:0:{36087822-3E30-0982-8D2A-D21D073001B8}|RayMarch.csproj|solutionrelative:shaders\\raymarch.frag||{8B382828-6202-11D1-8870-0000F87579D2}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{36087822-3E30-0982-8D2A-D21D073001B8}|RayMarch.csproj|c:\\users\\ribha\\downloads\\projects\\raymarch\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{36087822-3E30-0982-8D2A-D21D073001B8}|RayMarch.csproj|solutionrelative:program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{36087822-3E30-0982-8D2A-D21D073001B8}|RayMarch.csproj|c:\\users\\ribha\\downloads\\projects\\raymarch\\scene.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
@@ -17,14 +25,6 @@
     {
       "AbsoluteMoniker": "D:0:0:{36087822-3E30-0982-8D2A-D21D073001B8}|RayMarch.csproj|c:\\users\\ribha\\downloads\\projects\\raymarch\\shader.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{36087822-3E30-0982-8D2A-D21D073001B8}|RayMarch.csproj|solutionrelative:shader.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{36087822-3E30-0982-8D2A-D21D073001B8}|RayMarch.csproj|c:\\users\\ribha\\downloads\\projects\\raymarch\\renderquad.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{36087822-3E30-0982-8D2A-D21D073001B8}|RayMarch.csproj|solutionrelative:renderquad.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{36087822-3E30-0982-8D2A-D21D073001B8}|RayMarch.csproj|c:\\users\\ribha\\downloads\\projects\\raymarch\\raymarchwindow.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{36087822-3E30-0982-8D2A-D21D073001B8}|RayMarch.csproj|solutionrelative:raymarchwindow.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{36087822-3E30-0982-8D2A-D21D073001B8}|RayMarch.csproj|c:\\users\\ribha\\downloads\\projects\\raymarch\\camera.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
@@ -62,17 +62,17 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 4,
+          "SelectedChildIndex": 5,
           "Children": [
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 2,
               "Title": "Raymarch.frag",
               "DocumentMoniker": "C:\\Users\\ribha\\Downloads\\Projects\\RayMarch\\Shaders\\Raymarch.frag",
               "RelativeDocumentMoniker": "Shaders\\Raymarch.frag",
               "ToolTip": "C:\\Users\\ribha\\Downloads\\Projects\\RayMarch\\Shaders\\Raymarch.frag",
               "RelativeToolTip": "Shaders\\Raymarch.frag",
-              "ViewState": "AgIAAMYAAAAAAAAAAAAqwNwAAAAAAAAAAAAAAA==",
+              "ViewState": "AgIAAOoAAAAAAAAAAAAqwNwAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001001|",
               "WhenOpened": "2025-08-22T20:11:54.185Z",
               "EditorCaption": ""
@@ -91,7 +91,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 5,
+              "DocumentIndex": 1,
               "Title": "RaymarchWindow.cs",
               "DocumentMoniker": "C:\\Users\\ribha\\Downloads\\Projects\\RayMarch\\RaymarchWindow.cs",
               "RelativeDocumentMoniker": "RaymarchWindow.cs",
@@ -99,7 +99,8 @@
               "RelativeToolTip": "RaymarchWindow.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAABYAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-08-22T20:05:16.736Z"
+              "WhenOpened": "2025-08-22T20:05:16.736Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
@@ -115,7 +116,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 0,
+              "DocumentIndex": 3,
               "Title": "Program.cs",
               "DocumentMoniker": "C:\\Users\\ribha\\Downloads\\Projects\\RayMarch\\Program.cs",
               "RelativeDocumentMoniker": "Program.cs",
@@ -128,19 +129,20 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 4,
+              "DocumentIndex": 0,
               "Title": "RenderQuad.cs",
               "DocumentMoniker": "C:\\Users\\ribha\\Downloads\\Projects\\RayMarch\\RenderQuad.cs",
               "RelativeDocumentMoniker": "RenderQuad.cs",
               "ToolTip": "C:\\Users\\ribha\\Downloads\\Projects\\RayMarch\\RenderQuad.cs",
               "RelativeToolTip": "RenderQuad.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAABUAAAAAAAAAAAAAAA==",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABMAAAAqAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-08-22T20:05:56.746Z"
+              "WhenOpened": "2025-08-22T20:05:56.746Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 4,
               "Title": "Scene.cs",
               "DocumentMoniker": "C:\\Users\\ribha\\Downloads\\Projects\\RayMarch\\Scene.cs",
               "RelativeDocumentMoniker": "Scene.cs",
@@ -153,7 +155,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 3,
+              "DocumentIndex": 5,
               "Title": "Shader.cs",
               "DocumentMoniker": "C:\\Users\\ribha\\Downloads\\Projects\\RayMarch\\Shader.cs",
               "RelativeDocumentMoniker": "Shader.cs",
