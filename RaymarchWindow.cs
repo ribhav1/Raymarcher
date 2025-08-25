@@ -11,7 +11,7 @@ namespace RayMarch
     {
         private Shader _raymarchShader;
         private RenderQuad _quad;
-        private Scene _currentScene;
+        public Scene _currentScene;
         private Stopwatch _timer;
         private Camera _camera;
 
@@ -36,10 +36,22 @@ namespace RayMarch
                 //new Light(new Vector3(0, 10, 0), new Vector3(1, 1, 1), 1f),
                 new Box(new Vector3(0f, -5f, 0f), new Vector4(0.1f, 0.1f, 1f, 1f), new Vector3(10f, 0.1f, 10f), new Vector3(), 0.2f)
             });
+            _currentScene.SetUpdate(DemoSceneUpdate);
             _timer = Stopwatch.StartNew();
             _camera = new Camera();
 
         }
+
+        void DemoSceneUpdate(double time)
+        {
+            _currentScene.Objects[1].Position = new Vector3(3 * (float)Math.Cos(time + 0.75), 3 * (float)Math.Sin(time + 0.75), 0);
+            _currentScene.Objects[2].Position = new Vector3(-3 * (float)Math.Cos(time - 0.75), -3 * (float)Math.Sin(time - 0.75), 0);
+            _currentScene.Objects[3].Position = new Vector3(3 * (float)Math.Cos(time - 0.75), 3 * (float)Math.Sin(time - 0.75), 0);
+            _currentScene.Objects[4].Position = new Vector3(-3 * (float)Math.Cos(time + 0.75), -3 * (float)Math.Sin(time + 0.75), 0);
+            //_currentScene._objects[6].Rotation = new Vector3(0.0f, (float)time, 0.0f);
+            _currentScene.Objects[5].Rotation = new Vector3(0.0f, (float)time, 0.0f);
+        }
+
         protected override void OnResize(ResizeEventArgs e)
         {
             base.OnResize(e);
@@ -52,8 +64,8 @@ namespace RayMarch
             GL.Clear(ClearBufferMask.ColorBufferBit);
 
             _raymarchShader.Use();
-            double elapsedTime = _timer.Elapsed.TotalSeconds;
 
+            double elapsedTime = _timer.Elapsed.TotalSeconds;
             _currentScene.Update(elapsedTime);
 
             _camera.UpdateFromInput(KeyboardState, MouseState, (float)args.Time);

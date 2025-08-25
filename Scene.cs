@@ -2,52 +2,68 @@
 using OpenTK.Mathematics;
 using RayMarch.Objects;
 using System;
+using System.Collections.Generic;
 
 namespace RayMarch
 {
     class Scene
     {
         private const int MAX_OBJS = 32;
-        //private const int MAX_LIGHTS = 32;
-        public List<IObject> _objects;
-        //private Light[] _lights;
+        private readonly List<IObject> _objects;
+        public IReadOnlyList<IObject> Objects => _objects;
 
         private Vector3 SunDirection;
         private Vector3 SunColor;
 
+        private Action<double> UpdateAction;
+
+        public Scene()
+        {
+            _objects = new List<IObject>();
+        }
+
         public Scene(List<IObject> Objects)
         {
-            //_objects = new List<IObject>
-            //{
-            //    new Sphere(new Vector3(0,0,0), new Vector4(1,0.1f,0.1f,1), 1f, 0.2f),
-            //    new Sphere(Vector3.Zero, new Vector4(0.1f, 1f, 0.1f, 1), 1f, 0.2f),
-            //    new Sphere(Vector3.Zero, new Vector4(0.1f, 0.1f, 1, 1), 1f, 0.2f),
-            //    new Sphere(Vector3.Zero, new Vector4(1, 1, 0.1f, 1), 1f, 0.2f),
-            //    new Sphere(Vector3.Zero, new Vector4(0.1f, 1, 1, 1), 1f, 0.2f),
-            //    new Light(new Vector3(0, 5, 0), new Vector3(1, 1, 1), 1f),
-            //    new Box(new Vector3(0f, -5f, 0f), new Vector4(0.1f, 0.1f, 1f, 1f), new Vector3(10f, 0.1f, 10f), new Vector3(), 0.2f)
-            //};
             _objects = Objects;
+        }
 
-            //_lights = new Light[] {
-            //    new Light(new Vector3(0, 5, 0), new Vector3(1, 1, 1)),
-            //};
+        public void AddObject(IObject addObject)
+        {
+            if (_objects.Count < MAX_OBJS)
+            {
+                _objects.Add(addObject);
+            }
+            else
+            {
+                throw new InvalidOperationException("Too many objects in scene!");
+            }
+        }
+
+        public void RemoveObject(IObject removeObject)
+        {
+            if (_objects.Contains(removeObject))
+            {
+                _objects.Remove(removeObject);
+            }
+            else
+            {
+                throw new InvalidOperationException("The object you are trying to remove does not exist");
+            }
+        }
+
+        public void SetUpdate(Action<double> UpdateActionFunction)
+        {
+            UpdateAction = UpdateActionFunction;
         }
 
         public void Update(double time)
         {
-            _objects[1].Position = new Vector3(3 * (float)Math.Cos(time + 0.75), 3 * (float)Math.Sin(time + 0.75), 0);
-            _objects[2].Position = new Vector3(-3 * (float)Math.Cos(time - 0.75), -3 * (float)Math.Sin(time - 0.75), 0);
-            _objects[3].Position = new Vector3(3 * (float)Math.Cos(time - 0.75), 3 * (float)Math.Sin(time - 0.75), 0);
-            _objects[4].Position = new Vector3(-3 * (float)Math.Cos(time + 0.75), -3 * (float)Math.Sin(time + 0.75), 0);
-            //_objects[6].Rotation = new Vector3(0.0f, (float)time, 0.0f);
-            _objects[5].Rotation = new Vector3(0.0f, (float)time, 0.0f);
+            UpdateAction?.Invoke(time);
         }
 
         public void UploadToShader(Shader shader)
         {
             shader.SetInt("objCount", _objects.Count);
-            //shader.SetInt("lightCount", _lights.Length);
 
             Vector3[] posArray = new Vector3[MAX_OBJS];
             Vector4[] colArray = new Vector4[MAX_OBJS];
@@ -84,16 +100,6 @@ namespace RayMarch
 
             SunColor = new Vector3(1.0f, 0.95f, 0.8f);
             shader.SetVector3("sunColor", SunColor.X, SunColor.Y, SunColor.Z);
-
-            //Vector3[] lightPosArray = new Vector3[MAX_LIGHTS];
-            //Vector3[] lightColArray = new Vector3[MAX_LIGHTS];
-            //for (int i = 0; i < _lights.Length; i++)
-            //{
-            //    lightPosArray[i] = _lights[i].Position;
-            //    lightColArray[i] = _lights[i].Color;
-            //}
-            //GL.Uniform3(GL.GetUniformLocation(shader.Handle, "lightPos"), _lights.Length, ref lightPosArray[0].X);
-            //GL.Uniform3(GL.GetUniformLocation(shader.Handle, "lightColor"), _lights.Length, ref lightColArray[0].X);
         }
     }
 }
