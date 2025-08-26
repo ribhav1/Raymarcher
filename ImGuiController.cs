@@ -10,6 +10,7 @@ using System.Runtime.InteropServices;
 
 namespace RayMarch
 {
+    // made possible thanks to github.com/NogginBops/ImGui.NET_OpenTK_Sample
     public sealed class ImGuiController : IDisposable
     {
         private int _vao;
@@ -68,36 +69,35 @@ namespace RayMarch
 
         private void CreateDeviceObjects()
         {
-            const string vertexSrc = @"
-            #version 330 core
+            string vertexSrc = 
+            @"#version 330 core
+            uniform mat4 projection_matrix;
+
             layout(location = 0) in vec2 in_position;
             layout(location = 1) in vec2 in_texCoord;
             layout(location = 2) in vec4 in_color;
 
-            uniform mat4 projection_matrix;
-
-            out vec2 frag_texCoord;
-            out vec4 frag_color;
+            out vec4 color;
+            out vec2 texCoord;
 
             void main()
             {
-                frag_texCoord = in_texCoord;
-                frag_color = in_color;
-                gl_Position = projection_matrix * vec4(in_position, 0.0, 1.0);
+                gl_Position = projection_matrix * vec4(in_position, 0, 1);
+                color = in_color;
+                texCoord = in_texCoord;
             }";
+            string fragmentSrc = 
+            @"#version 330 core
+            uniform sampler2D in_fontTexture;
 
-            const string fragmentSrc = @"
-            #version 330 core
-            in vec2 frag_texCoord;
-            in vec4 frag_color;
+            in vec4 color;
+            in vec2 texCoord;
 
-            uniform sampler2D in_texture;
-
-            out vec4 out_color;
+            out vec4 outputColor;
 
             void main()
             {
-                out_color = frag_color * texture(in_texture, frag_texCoord);
+                outputColor = color * texture(in_fontTexture, texCoord);
             }";
 
             int vs = Compile(ShaderType.VertexShader, vertexSrc);
