@@ -1,5 +1,6 @@
 ﻿using OpenTK.Graphics.OpenGL4;
-using OpenTK.Mathematics;
+//using OpenTK.Mathematics;
+using System.Numerics;
 using RayMarch.Objects;
 using System;
 using System.Collections.Generic;
@@ -56,9 +57,25 @@ namespace RayMarch
             UpdateAction = UpdateActionFunction;
         }
 
-        public void Update(double time)
+        public void Update(float deltaTime, double time)
         {
             UpdateAction?.Invoke(time);
+
+            foreach (IObject obj in _objects)
+            {
+                obj.Position += obj.LinearVelocity * deltaTime;
+                obj.Rotation += obj.AngularVelocity * deltaTime;
+            }
+        }
+
+        public void SetSunDirection(Vector3 direction)
+        {
+            SunDirection = direction;
+        }
+
+        public void SetSunColor(Vector3 color)
+        {
+            SunColor = color;
         }
 
         public void UploadToShader(Shader shader)
@@ -71,7 +88,7 @@ namespace RayMarch
             int[] typeArray = new int[MAX_OBJS];
             float[] sphereRadiiArray = new float[MAX_OBJS];
             Vector3[] boxSizeArray = new Vector3[MAX_OBJS];
-            Vector3[] rotationArray = new Vector3[MAX_OBJS];
+            OpenTK.Mathematics.Matrix3[] rotInvArray = new OpenTK.Mathematics.Matrix3[MAX_OBJS];
 
             for (int i = 0; i < _objects.Count; i++)
             {
@@ -79,18 +96,19 @@ namespace RayMarch
                 colArray[i] = _objects[i].Color;
                 reflectivityArray[i] = _objects[i].Reflectivity;
                 typeArray[i] = _objects[i].Type;
-                rotationArray[i] = _objects[i].Rotation;
+                rotInvArray[i] = Shader.CalculateInverseRotationMatrix((OpenTK.Mathematics.Vector3)_objects[i].Rotation);
 
                 if (_objects[i] is Sphere sphere) sphereRadiiArray[i] = sphere.Radius;
                 if (_objects[i] is Light light) sphereRadiiArray[i] = light.Radius;
                 if (_objects[i] is Box box) boxSizeArray[i] = box.Size;
             }
 
+            shader.SetMatrix3Array("objInvRotMat", rotInvArray, _objects.Count);
+
             GL.Uniform3(GL.GetUniformLocation(shader.Handle, "objPos"), _objects.Count, ref posArray[0].X);
             GL.Uniform4(GL.GetUniformLocation(shader.Handle, "objColor"), _objects.Count, ref colArray[0].X);
             GL.Uniform1(GL.GetUniformLocation(shader.Handle, "objReflect"), _objects.Count, ref reflectivityArray[0]);
             GL.Uniform1(GL.GetUniformLocation(shader.Handle, "objType"), _objects.Count, ref typeArray[0]);
-            GL.Uniform3(GL.GetUniformLocation(shader.Handle, "objRot"), _objects.Count, ref rotationArray[0].X);
 
             GL.Uniform1(GL.GetUniformLocation(shader.Handle, "sphereRadii"), _objects.Count, ref sphereRadiiArray[0]);
             GL.Uniform3(GL.GetUniformLocation(shader.Handle, "boxSizes"), _objects.Count, ref boxSizeArray[0].X);

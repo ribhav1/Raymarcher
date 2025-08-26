@@ -10,7 +10,7 @@ namespace RayMarch
             var native = new NativeWindowSettings
             {
                 Title = "RayMarch",
-                Size = new Vector2i(1920, 1080)
+                ClientSize = new Vector2i(1920, 1080),
             };
 
             using var window = new RaymarchWindow(GameWindowSettings.Default, native);

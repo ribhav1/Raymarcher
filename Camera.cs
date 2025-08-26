@@ -1,4 +1,4 @@
-﻿using OpenTK.Mathematics;
+﻿using System.Numerics;
 using OpenTK.Windowing.GraphicsLibraryFramework;
 using System;
 
@@ -34,12 +34,14 @@ namespace RayMarch
             Up = Vector3.Normalize(Vector3.Cross(Right, Forward));
         }
 
-        public void UpdateFromInput(KeyboardState keys, MouseState mouse, float deltaTime)
+        public void UpdateFromInput(KeyboardState keys, MouseState mouse, float deltaTime, bool inScene)
         {
+            if (!inScene) return;
+
             // mouse look
             Yaw -= mouse.Delta.X * Sensitivity;
             Pitch -= mouse.Delta.Y * Sensitivity;
-            Pitch = MathHelper.Clamp(Pitch, -MathHelper.PiOver2 + 0.01f, MathHelper.PiOver2 - 0.01f);
+            Pitch = OpenTK.Mathematics.MathHelper.Clamp(Pitch, -OpenTK.Mathematics.MathHelper.PiOver2 + 0.01f, OpenTK.Mathematics.MathHelper.PiOver2 - 0.01f);
 
             // keyboard movement
             Vector3 move = Vector3.Zero;
@@ -50,7 +52,7 @@ namespace RayMarch
             if (keys.IsKeyDown(Keys.Space)) move += Vector3.UnitY;
             if (keys.IsKeyDown(Keys.LeftShift)) move -= Vector3.UnitY;
 
-            if (move.LengthSquared > 0)
+            if (move.LengthSquared() > 0)
                 move = Vector3.Normalize(move) * Speed * deltaTime;
 
             Position += move;

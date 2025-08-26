@@ -17,52 +17,16 @@ uniform vec3 objPos[MAX_OBJS];
 uniform vec4 objColor[MAX_OBJS];
 uniform float objReflect[MAX_OBJS];
 uniform int objType[MAX_OBJS];
-uniform vec3 objRot[MAX_OBJS];
+uniform mat3 objInvRotMat[MAX_OBJS];
 
 uniform float sphereRadii[MAX_OBJS];
 uniform vec3 boxSizes[MAX_OBJS];
 
-//uniform int lightCount;
-//uniform vec3 lightPos[MAX_LIGHTS];
-//uniform vec3 lightColor[MAX_LIGHTS];
-
 uniform vec3 sunDir;
 uniform vec3 sunColor;
 
-const float MAX_DIST = 100.0;   // max ray length
-const int MAX_STEPS = 200;    // more steps for edge safety
-
-// apply the inverse rotation of the object to the point
-// i put my blind trust into these matrices
-vec3 inverseRotate(vec3 p, vec3 rot)
-{
-    float cx = cos(rot.x); 
-    float cy = cos(rot.y);
-    float cz = cos(rot.z);
-    float sx = sin(rot.x);
-    float sy = sin(rot.y);
-    float sz = sin(rot.z);
-
-    mat3 mx = mat3(
-        1, 0, 0,
-        0, cx, sx,
-        0, -sx, cx
-    );
-
-    mat3 my = mat3(
-        cy, 0, -sy,
-        0, 1, 0,
-        sy, 0, cy
-    );
-
-    mat3 mz = mat3(
-        cz, sz, 0,
-        -sz, cz, 0,
-        0, 0, 1
-    );
-
-    return mz * my * mx * p;
-}
+const float MAX_DIST = 50.0;
+const int MAX_STEPS = 80;
 
 float map(vec3 p, out int id, out bool isLight) {
     float minD = 1e9;
@@ -79,7 +43,7 @@ float map(vec3 p, out int id, out bool isLight) {
         {
             // move point to local space
             vec3 q = p - objPos[i];
-            q = inverseRotate(q, objRot[i]); // makes rotation centered around object and not world origin 
+            q = objInvRotMat[i] * q;
             q = abs(q) - boxSizes[i];
             d = length(max(q,0.0)) + min(max(q.x,max(q.y,q.z)),0.0);
         }
@@ -90,15 +54,6 @@ float map(vec3 p, out int id, out bool isLight) {
          
         }
     }
-    //for (int i = 0; i < lightCount; i++)
-    //{
-    //    float d = distance(p, lightPos[i]) - 1.0;
-    //    if (d < minD) {
-    //        minD = d;
-    //        id = i;
-    //        isLight = true;
-    //    }
-    //}
     return minD;
 }
 
@@ -113,8 +68,8 @@ float map(vec3 p) {
     return map(p, dummyInt, dummyBool);
 }
 
-vec3 getNormal(vec3 p, int id) {
-    float eps = 0.002;
+vec3 getNormal(vec3 p, int id, float t) {
+    float eps = 0.001;
     return normalize(vec3(
         map(p + vec3(eps,0,0), id) - map(p - vec3(eps,0,0), id),
         map(p + vec3(0,eps,0), id) - map(p - vec3(0,eps,0), id),
@@ -127,7 +82,7 @@ bool isInShadow(vec3 p, vec3 n, vec3 dirToLight, float maxDist) {
     float t = 0.01;
     vec3 ro = p + n * 0.01;
 
-    for (int i = 0; i < 100; i++) {
+    for (int i = 0; i < MAX_STEPS; i++) {
         vec3 q = ro + dirToLight * t;
         int id;
         bool isLight;
@@ -188,7 +143,7 @@ void raymarch(out vec4 fragColor, in vec2 fragCoord) {
             float d = map(p, id, isLight);
 
             // check for hit
-            if (d < 0.001) {
+            if (d < 0.001 * t) {
                 hit = true;
 
                 // hit a light sphere set pixel as white
@@ -197,7 +152,7 @@ void raymarch(out vec4 fragColor, in vec2 fragCoord) {
                     return;
                 }
 
-                vec3 n = getNormal(p, id);
+                vec3 n = getNormal(p, id, t);
 
                 // sun lighting contributions
                 vec3 sunContribution = vec3(0.0);
@@ -260,7 +215,7 @@ void raymarch(out vec4 fragColor, in vec2 fragCoord) {
     // background if no hit
     if (!hit) fragColor = vec4(getEnvironment(rd), 1.0);
 }
-
+    
 
 void main() {
     vec4 col;
