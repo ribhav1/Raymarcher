@@ -4,7 +4,7 @@ using System.Numerics;
 namespace RayMarch.Objects
 {
     //record Sphere(Vector3 Position, Vector4 Color, float Reflectivity);
-    class Sphere(Vector3 _Position, Vector4 _Color, float _Radius, float _Reflectivity) : IObject
+    class Sphere(Vector3 _Position, Vector3 Rotation, Vector4 _Color, float _Reflectivity, float _Radius) : IObject
     {
         public Vector3 Position { get; set; } = _Position;
 

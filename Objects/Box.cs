@@ -3,7 +3,7 @@ using System.Numerics;
 
 namespace RayMarch.Objects
 {
-    class Box(Vector3 _Position, Vector4 _Color, Vector3 _Size, Vector3 _Rotation, float _Reflectivity) : IObject
+    class Box(Vector3 _Position, Vector3 _Rotation, Vector4 _Color, float _Reflectivity, Vector3 _Size) : IObject
     {
         public Vector3 Position { get; set; } = _Position;
 

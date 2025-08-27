@@ -1,10 +1,11 @@
-﻿using OpenTK.Graphics.OpenGL4;
+﻿using ImGuiNET;
+using OpenTK.Graphics.OpenGL4;
 //using OpenTK.Mathematics;
 using OpenTK.Windowing.Common;
 using OpenTK.Windowing.Desktop;
+using OpenTK.Windowing.GraphicsLibraryFramework;
 using RayMarch.Objects;
 using System.Diagnostics;
-using ImGuiNET;
 using System.Numerics;
 
 namespace RayMarch
@@ -20,6 +21,16 @@ namespace RayMarch
 
         private bool _showSceneControls = true;
         private bool _inScene = false;
+        
+        private int currentItem = 0;
+        private string[] objectTypes = new string[] { "Sphere", "Box", "Light" };
+
+        private Vector3 posText = Vector3.Zero;
+        private Vector3 rotText = Vector3.Zero;
+        private Vector4 colText = Vector4.Zero;
+        private string reflText = "";
+        private string radText = "";
+        private Vector3 sizeText = Vector3.Zero;
 
         public RaymarchWindow(GameWindowSettings gws, NativeWindowSettings nws) : base(gws, nws) { /*CursorState = CursorState.Grabbed;*/ }
 
@@ -30,19 +41,22 @@ namespace RayMarch
 
             _imgui = new ImGuiController(Size.X, Size.Y);
             ImGui.GetIO().FontGlobalScale = 2f;
-            ImGui.GetIO().ConfigFlags |= ImGuiConfigFlags.DockingEnable;
+            this.TextInput += (TextInputEventArgs e) =>
+            {
+                ImGui.GetIO().AddInputCharacter((uint)e.Unicode);
+            };
 
             _raymarchShader = new Shader(File.ReadAllText("Shaders/Raymarch.vert"), File.ReadAllText("Shaders/Raymarch.frag"));
             _quad = new RenderQuad();
             // setting it up like this to allow for scene switching in the future
             _currentScene = new Scene(new List<IObject>
             {
-                new Sphere(new Vector3(0,0,0), new Vector4(1,0.1f,0.1f,1), 1f, 0.9f),
-                new Sphere(Vector3.Zero, new Vector4(0.1f, 1f, 0.1f, 1), 1f, 0.2f),
-                new Sphere(Vector3.Zero, new Vector4(0.1f, 0.1f, 1, 1), 1f, 0.2f),
-                new Sphere(Vector3.Zero, new Vector4(1, 1, 0.1f, 1), 1f, 0.2f),
-                new Sphere(Vector3.Zero, new Vector4(0.1f, 1, 1, 1), 1f, 0.2f),
-                new Box(new Vector3(0f, -5f, 0f), new Vector4(0.1f, 0.1f, 1f, 1f), new Vector3(10f, 0.1f, 10f), new Vector3(), 0.2f),
+                new Sphere(new Vector3(0,0,0), new Vector3(0,0,0), new Vector4(1,0.1f,0.1f,1), 0.9f, 1f),
+                new Sphere(Vector3.Zero, new Vector3(0,0,0), new Vector4(0.1f, 1f, 0.1f, 1), 0.2f, 1f),
+                new Sphere(Vector3.Zero, new Vector3(0,0,0), new Vector4(0.1f, 0.1f, 1, 1), 0.2f, 1f),
+                new Sphere(Vector3.Zero, new Vector3(0,0,0), new Vector4(1, 1, 0.1f, 1), 0.2f, 1f),
+                new Sphere(Vector3.Zero, new Vector3(0,0,0), new Vector4(0.1f, 1, 1, 1), 0.2f, 1f),
+                new Box(new Vector3(0f, -5f, 0f), new Vector3(0,0,0), new Vector4(0.1f, 0.1f, 1f, 1f), 0.2f, new Vector3(10f, 0.1f, 10f)),
                 //new Light(new Vector3(0, 10, 0), new Vector3(1, 1, 1), 1f),
 
             });
@@ -68,8 +82,11 @@ namespace RayMarch
             // switch between in viewport controls and ui
             if (MouseState.IsButtonReleased(OpenTK.Windowing.GraphicsLibraryFramework.MouseButton.Button1))
             {
-                _inScene = true;
-                this.CursorState = CursorState.Grabbed;
+                if (!ImGui.GetIO().WantCaptureMouse)
+                {
+                    _inScene = true;
+                    this.CursorState = CursorState.Grabbed;
+                }
             }
             if (KeyboardState.IsKeyReleased(OpenTK.Windowing.GraphicsLibraryFramework.Keys.Escape))
             {
@@ -131,7 +148,7 @@ namespace RayMarch
                             obj.Position = pos;
 
                         Vector3 rot = obj.Rotation;
-                        if (ImGui.DragFloat3("Rotation", ref rot, 1f))
+                        if (ImGui.DragFloat3("Rotation", ref rot, 0.1f))
                             obj.Rotation = rot;
 
                         Vector4 color = obj.Color;
@@ -142,9 +159,52 @@ namespace RayMarch
                         if (ImGui.SliderFloat("Reflectivity", ref reflectivity, 0f, 1f))
                             obj.Reflectivity = reflectivity;
 
+                        if(ImGui.Button("Remove Object"))
+                        {
+                            _currentScene.RemoveObject(_currentScene.Objects[i]);
+                        }    
+
                         ImGui.TreePop();
                     }
                 }
+                if (ImGui.CollapsingHeader("Add Object"))
+                {
+                    ImGui.Combo("Type", ref currentItem, objectTypes, objectTypes.Length);
+                    ImGui.InputFloat3("Create Position", ref posText);
+                    ImGui.InputFloat3("Create Rotation", ref rotText);
+                    ImGui.InputText("Create Reflectivity", ref reflText, 20, ImGuiInputTextFlags.CharsDecimal);
+                    ImGui.ColorEdit4("Create Color", ref colText);
+                    
+                    switch (objectTypes[currentItem])
+                    {
+                        case "Sphere":
+                        case "Light":
+                            ImGui.InputText("Radius", ref radText, 20, ImGuiInputTextFlags.CharsDecimal);
+                            break;
+                        case "Box":
+                            ImGui.InputFloat3("Size", ref sizeText);
+                            break;
+                    }
+
+                    if (ImGui.Button("Add"))
+                    {
+                        IObject addObject = null;
+
+                        switch (objectTypes[currentItem])
+                        {
+                            case "Sphere":
+                            case "Light":
+                                addObject = new Sphere(posText, rotText, colText, ToFloatOrZero(reflText), ToFloatOrZero(radText));
+                                break;
+                            case "Box":
+                                addObject = new Box(posText, rotText, colText, ToFloatOrZero(reflText), sizeText);
+                                break;
+                        }
+
+                        if (addObject != null) _currentScene.AddObject(addObject);
+                    }
+                }
+
             }
             ImGui.End();
             _imgui.Render();
@@ -152,8 +212,17 @@ namespace RayMarch
             SwapBuffers();
         }
 
+        float ToFloatOrZero(string s)
+        {
+            if (string.IsNullOrWhiteSpace(s))
+                return 0;
+
+            return float.TryParse(s, out float value) ? value : 0;
+        }
+
         void DemoSceneUpdate(double time)
         {
+            if (_currentScene.Objects.Count < 6) return;
             _currentScene.Objects[1].Position = new Vector3(3 * (float)Math.Cos(time + 0.75), 3 * (float)Math.Sin(time + 0.75), _currentScene.Objects[1].Position.Z);
             _currentScene.Objects[2].Position = new Vector3(-3 * (float)Math.Cos(time - 0.75), -3 * (float)Math.Sin(time - 0.75), _currentScene.Objects[2].Position.Z);
             _currentScene.Objects[3].Position = new Vector3(3 * (float)Math.Cos(time - 0.75), 3 * (float)Math.Sin(time - 0.75), _currentScene.Objects[3].Position.Z);
