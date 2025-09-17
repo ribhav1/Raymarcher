@@ -116,9 +116,15 @@ namespace RayMarch
 
             _quad.Render();
 
-            
             // ui rendering logic
-            _imgui.Update(this, (float)args.Time);
+            if (!_inScene)
+            {
+                _imgui.Update(this, (float)args.Time);
+            }
+            else
+            {
+                ImGui.NewFrame();
+            }
 
             ImGui.Begin("Scene Controls", ref _showSceneControls);
             if (ImGui.CollapsingHeader("Performance", ImGuiTreeNodeFlags.DefaultOpen))
@@ -129,8 +135,13 @@ namespace RayMarch
             if (ImGui.CollapsingHeader("Camera", ImGuiTreeNodeFlags.DefaultOpen))
             {
                 ImGui.SliderFloat("FOV", ref _camera.Fov, 20f, 120f);
-                ImGui.SliderFloat("Speed", ref _camera.Speed, 0.1f, 10f);
-                ImGui.SliderFloat("Sensitivity", ref _camera.Sensitivity, 0.01f, 1f);
+                ImGui.SliderFloat("Speed", ref _camera.Speed, 1f, 40f);
+                float sliderScale = _camera.Sensitivity * 1000f;
+                if(ImGui.SliderFloat("Sensitivity", ref sliderScale, 0f, 1f))
+                {
+                    _camera.Sensitivity = sliderScale / 1000f;
+                }
+
 
                 Vector3 camPos = _camera.Position;
                 if (ImGui.DragFloat3("Position", ref camPos))
