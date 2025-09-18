@@ -1,6 +1,5 @@
 ﻿using ImGuiNET;
 using OpenTK.Graphics.OpenGL4;
-//using OpenTK.Mathematics;
 using OpenTK.Windowing.Common;
 using OpenTK.Windowing.Desktop;
 using OpenTK.Windowing.GraphicsLibraryFramework;
@@ -20,17 +19,22 @@ namespace RayMarch
         private ImGuiController _imgui;
 
         private bool _showSceneControls = true;
+        private bool _showPerformance = true;
+        private bool _showCamera = true;
+        private bool _showObjects = true;
         private bool _inScene = false;
         
         private int currentItem = 0;
-        private string[] objectTypes = new string[] { "Sphere", "Box", "Light" };
+        private string[] objectTypes = new string[] { "Sphere", "Box", "Light", "Torus" };
 
         private Vector3 posText = Vector3.Zero;
         private Vector3 rotText = Vector3.Zero;
         private Vector4 colText = Vector4.Zero;
-        private string reflText = "";
-        private string radText = "";
+        private float reflText = 0;
+        private float radText = 0;
         private Vector3 sizeText = Vector3.Zero;
+        private float radToroidalText = 0;
+        private float radPoloidalText = 0;
 
         public RaymarchWindow(GameWindowSettings gws, NativeWindowSettings nws) : base(gws, nws) { /*CursorState = CursorState.Grabbed;*/ }
 
@@ -51,13 +55,14 @@ namespace RayMarch
             // setting it up like this to allow for scene switching in the future
             _currentScene = new Scene(new List<IObject>
             {
-                new Sphere(new Vector3(0,0,0), new Vector3(0,0,0), new Vector4(1,0.1f,0.1f,1), 0.9f, 1f),
-                new Sphere(Vector3.Zero, new Vector3(0,0,0), new Vector4(0.1f, 1f, 0.1f, 1), 0.2f, 1f),
-                new Sphere(Vector3.Zero, new Vector3(0,0,0), new Vector4(0.1f, 0.1f, 1, 1), 0.2f, 1f),
-                new Sphere(Vector3.Zero, new Vector3(0,0,0), new Vector4(1, 1, 0.1f, 1), 0.2f, 1f),
-                new Sphere(Vector3.Zero, new Vector3(0,0,0), new Vector4(0.1f, 1, 1, 1), 0.2f, 1f),
+                new Sphere(Vector3.Zero, Vector3.Zero, new Vector4(1,0.1f,0.1f,1), 0.9f, 1f),
+                new Sphere(Vector3.Zero, Vector3.Zero, new Vector4(0.1f, 1f, 0.1f, 1), 0.2f, 1f),
+                new Sphere(Vector3.Zero, Vector3.Zero, new Vector4(0.1f, 0.1f, 1, 1), 0.2f, 1f),
+                new Sphere(Vector3.Zero, Vector3.Zero, new Vector4(1, 1, 0.1f, 1), 0.2f, 1f),
+                new Sphere(Vector3.Zero, Vector3.Zero, new Vector4(0.1f, 1, 1, 1), 0.2f, 1f),
                 new Box(new Vector3(0f, -5f, 0f), new Vector3(0,0,0), new Vector4(0.1f, 0.1f, 1f, 1f), 0.2f, new Vector3(10f, 0.1f, 10f)),
                 //new Light(new Vector3(0, 10, 0), new Vector3(1, 1, 1), 1f),
+                new Torus(new Vector3(-3f, 0f, 0f), Vector3.Zero, new Vector4(1f, 0.1f, 1, 1), 0.5f, 1.5f, 0.25f),
 
             });
             _currentScene.SetUpdate(DemoSceneUpdate);
@@ -126,119 +131,164 @@ namespace RayMarch
                 ImGui.NewFrame();
             }
 
-            ImGui.Begin("Scene Controls", ref _showSceneControls);
-            if (ImGui.CollapsingHeader("Performance", ImGuiTreeNodeFlags.DefaultOpen))
+            // main menu ui
+            if (ImGui.BeginMainMenuBar())
             {
-                ImGui.Text($"FPS: {1f / args.Time:0}");
-                ImGui.Text($"Frame Time: {args.Time * 1000:0.00} ms");
-            }
-            if (ImGui.CollapsingHeader("Camera", ImGuiTreeNodeFlags.DefaultOpen))
-            {
-                ImGui.SliderFloat("FOV", ref _camera.Fov, 20f, 120f);
-                ImGui.SliderFloat("Speed", ref _camera.Speed, 1f, 40f);
-                float sliderScale = _camera.Sensitivity * 1000f;
-                if(ImGui.SliderFloat("Sensitivity", ref sliderScale, 0f, 1f))
+                if (ImGui.BeginMenu("File"))
                 {
-                    _camera.Sensitivity = sliderScale / 1000f;
+                    if (ImGui.MenuItem("New")) { }
+                    if (ImGui.MenuItem("Open")) { }
+                    if (ImGui.MenuItem("Save")) { }
+                    if (ImGui.MenuItem("Exit")) { }
+                    ImGui.EndMenu();
                 }
 
-
-                Vector3 camPos = _camera.Position;
-                if (ImGui.DragFloat3("Position", ref camPos))
-                    _camera.Position = camPos;
-            }
-            if (ImGui.CollapsingHeader("Scene Objects", ImGuiTreeNodeFlags.DefaultOpen))
-            {
-                for (int i = 0; i < _currentScene.Objects.Count; i++)
+                if (ImGui.BeginMenu("Edit"))
                 {
-                    var obj = _currentScene.Objects[i];
-                    if (ImGui.TreeNode($"Object {i}: {obj.GetType().Name}"))
+
+                    ImGui.EndMenu();
+                }
+
+                if (ImGui.BeginMenu("Window"))
+                {
+                    if (ImGui.BeginMenu("Scene Controls"))
                     {
-                        Vector3 pos = obj.Position;
-                        if (ImGui.DragFloat3("Position", ref pos, 0.1f))
-                            obj.Position = pos;
+                        ImGui.Checkbox("Show", ref _showSceneControls);
+                        ImGui.Separator();
 
-                        Vector3 rot = obj.Rotation;
-                        if (ImGui.DragFloat3("Rotation", ref rot, 0.1f))
-                            obj.Rotation = rot;
+                        ImGui.Checkbox("Performance", ref _showPerformance);
+                        ImGui.Checkbox("Camera", ref _showCamera);
+                        ImGui.Checkbox("Objects", ref _showObjects);
 
-                        Vector4 color = obj.Color;
-                        if (ImGui.ColorEdit4("Color", ref color))
-                            obj.Color = color;
+                        ImGui.EndMenu();
+                    }
 
-                        float reflectivity = obj.Reflectivity;
-                        if (ImGui.SliderFloat("Reflectivity", ref reflectivity, 0f, 1f))
-                            obj.Reflectivity = reflectivity;
+                    ImGui.EndMenu();
+                }            
 
-                        if(ImGui.Button("Remove Object"))
+                ImGui.EndMainMenuBar();
+            }
+
+            // scene controls widget
+            if (_showSceneControls)
+            {
+                ImGui.Begin("Scene Controls");
+                if (_showPerformance && ImGui.CollapsingHeader("Performance", ImGuiTreeNodeFlags.DefaultOpen))
+                {
+                    ImGui.Text($"FPS: {1f / args.Time:0}");
+                    ImGui.Text($"Frame Time: {args.Time * 1000:0.00} ms");
+                }
+
+                if (_showCamera && ImGui.CollapsingHeader("Camera", ImGuiTreeNodeFlags.DefaultOpen))
+                {
+                    ImGui.SliderFloat("FOV", ref _camera.Fov, 20f, 120f);
+                    ImGui.SliderFloat("Speed", ref _camera.Speed, 1f, 40f);
+                    float sliderScale = _camera.Sensitivity * 1000f;
+                    if (ImGui.SliderFloat("Sensitivity", ref sliderScale, 0f, 1f))
+                    {
+                        _camera.Sensitivity = sliderScale / 1000f;
+                    }
+
+                    Vector3 camPos = _camera.Position;
+                    if (ImGui.DragFloat3("Position", ref camPos))
+                        _camera.Position = camPos;
+                }
+
+                if (_showObjects &&  ImGui.CollapsingHeader("Scene Objects", ImGuiTreeNodeFlags.DefaultOpen))
+                {
+                    for (int i = 0; i < _currentScene.Objects.Count; i++)
+                    {
+                        var obj = _currentScene.Objects[i];
+                        if (ImGui.TreeNode($"Object {i}: {obj.GetType().Name}"))
                         {
-                            _currentScene.RemoveObject(_currentScene.Objects[i]);
-                        }    
+                            Vector3 pos = obj.Position;
+                            if (ImGui.DragFloat3("Position", ref pos, 0.1f))
+                                obj.Position = pos;
 
-                        ImGui.TreePop();
-                    }
-                }
-                if (ImGui.CollapsingHeader("Add Object"))
-                {
-                    ImGui.Combo("Type", ref currentItem, objectTypes, objectTypes.Length);
-                    ImGui.InputFloat3("Create Position", ref posText);
-                    ImGui.InputFloat3("Create Rotation", ref rotText);
-                    ImGui.InputText("Create Reflectivity", ref reflText, 20, ImGuiInputTextFlags.CharsDecimal);
-                    ImGui.ColorEdit4("Create Color", ref colText);
-                    
-                    switch (objectTypes[currentItem])
-                    {
-                        case "Sphere":
-                        case "Light":
-                            ImGui.InputText("Radius", ref radText, 20, ImGuiInputTextFlags.CharsDecimal);
-                            break;
-                        case "Box":
-                            ImGui.InputFloat3("Size", ref sizeText);
-                            break;
-                    }
+                            Vector3 rot = obj.Rotation;
+                            if (ImGui.DragFloat3("Rotation", ref rot, 0.1f))
+                                obj.Rotation = rot;
 
-                    if (ImGui.Button("Add"))
+                            Vector4 color = obj.Color;
+                            if (ImGui.ColorEdit4("Color", ref color))
+                                obj.Color = color;
+
+                            float reflectivity = obj.Reflectivity;
+                            if (ImGui.SliderFloat("Reflectivity", ref reflectivity, 0f, 1f))
+                                obj.Reflectivity = reflectivity;
+
+                            if (ImGui.Button("Remove Object"))
+                            {
+                                _currentScene.RemoveObject(_currentScene.Objects[i]);
+                            }
+
+                            ImGui.TreePop();
+                        }
+                    }
+                    if (ImGui.CollapsingHeader("Add Object"))
                     {
-                        IObject addObject = null;
+                        ImGui.Combo("Type", ref currentItem, objectTypes, objectTypes.Length);
+                        ImGui.InputFloat3("Create Position", ref posText);
+                        ImGui.InputFloat3("Create Rotation", ref rotText);
+                        ImGui.InputFloat("Create Reflectivity", ref reflText, 0.1f);
+                        ImGui.ColorEdit4("Create Color", ref colText);
 
                         switch (objectTypes[currentItem])
                         {
                             case "Sphere":
                             case "Light":
-                                addObject = new Sphere(posText, rotText, colText, ToFloatOrZero(reflText), ToFloatOrZero(radText));
+                                ImGui.InputFloat("Radius", ref radText, 1f);
                                 break;
                             case "Box":
-                                addObject = new Box(posText, rotText, colText, ToFloatOrZero(reflText), sizeText);
+                                ImGui.InputFloat3("Size", ref sizeText);
+                                break;
+                            case "Torus":
+                                ImGui.InputFloat("Toroidal Radius", ref radToroidalText, 1f);
+                                ImGui.InputFloat("Poloidal Radius", ref radPoloidalText, 1f);
                                 break;
                         }
 
-                        if (addObject != null) _currentScene.AddObject(addObject);
-                    }
-                }
+                        if (ImGui.Button("Add"))
+                        {
+                            reflText = Math.Clamp(reflText, 0f, 1f);
+                            IObject addObject = null;
 
+                            switch (objectTypes[currentItem])
+                            {
+                                case "Sphere":
+                                case "Light":
+                                    addObject = new Sphere(posText, rotText, colText, reflText, radText);
+                                    break;
+                                case "Box":
+                                    addObject = new Box(posText, rotText, colText, reflText, sizeText);
+                                    break;
+                                case "Torus":
+                                    addObject = new Torus(posText, rotText, colText, reflText, radToroidalText, radPoloidalText);
+                                    break;
+                            }
+
+                            if (addObject != null) _currentScene.AddObject(addObject);
+                        }
+                    }
+
+                }
+                ImGui.End();
             }
-            ImGui.End();
+
             _imgui.Render();
 
             SwapBuffers();
         }
 
-        float ToFloatOrZero(string s)
-        {
-            if (string.IsNullOrWhiteSpace(s))
-                return 0;
-
-            return float.TryParse(s, out float value) ? value : 0;
-        }
-
         void DemoSceneUpdate(double time)
         {
-            if (_currentScene.Objects.Count < 6) return;
+            if (_currentScene.Objects.Count < 7) return;
             _currentScene.Objects[1].Position = new Vector3(3 * (float)Math.Cos(time + 0.75), 3 * (float)Math.Sin(time + 0.75), _currentScene.Objects[1].Position.Z);
             _currentScene.Objects[2].Position = new Vector3(-3 * (float)Math.Cos(time - 0.75), -3 * (float)Math.Sin(time - 0.75), _currentScene.Objects[2].Position.Z);
             _currentScene.Objects[3].Position = new Vector3(3 * (float)Math.Cos(time - 0.75), 3 * (float)Math.Sin(time - 0.75), _currentScene.Objects[3].Position.Z);
             _currentScene.Objects[4].Position = new Vector3(-3 * (float)Math.Cos(time + 0.75), -3 * (float)Math.Sin(time + 0.75), _currentScene.Objects[4].Position.Z);
             _currentScene.Objects[5].AngularVelocity = new Vector3(0, 1, 0);
+            _currentScene.Objects[6].Rotation = new Vector3((float)Math.Sin(time * 3) *0.25f, 0, (float)Math.Cos(time * 3) * 0.25f);
         }
 
     }

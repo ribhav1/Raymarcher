@@ -21,6 +21,7 @@ uniform mat3 objInvRotMat[MAX_OBJS];
 
 uniform float sphereRadii[MAX_OBJS];
 uniform vec3 boxSizes[MAX_OBJS];
+uniform vec2 torusRadii[MAX_OBJS];
 
 uniform vec3 sunDir;
 uniform vec3 sunColor;
@@ -38,15 +39,23 @@ float map(vec3 p, out int id, out bool isLight) {
         float d;
 
         // to render rotations, apply the inverse rotation to the input point
-        if (type == 0 || type == 1) d = distance(p, objPos[i]) - sphereRadii[i];
-        if (type == 2)
-        {
+        if (type == 0 || type == 1) { 
+            d = distance(p, objPos[i]) - sphereRadii[i]; 
+        }
+        else if (type == 2) {
             // move point to local space
             vec3 q = p - objPos[i];
-            q = objInvRotMat[i] * q;
+            q *= objInvRotMat[i];
             q = abs(q) - boxSizes[i];
             d = length(max(q,0.0)) + min(max(q.x,max(q.y,q.z)),0.0);
         }
+        else if (type == 3) {
+            vec3 ploc = p - objPos[i];
+            ploc *= objInvRotMat[i];
+            vec2 q = vec2(length(ploc.xz) - torusRadii[i].x, ploc.y);
+            d = length(q) - torusRadii[i].y;
+        }
+        
         if (d < minD) {
             minD = d;
             id = i;

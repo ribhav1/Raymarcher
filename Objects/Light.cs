@@ -4,7 +4,7 @@ using System.Numerics;
 namespace RayMarch.Objects
 {
     //record Light(Vector3 Position, Vector4 Color);
-    class Light(Vector3 _Position, Vector3 Rotation, Vector3 _Color, float _Radius) : IObject
+    class Light(Vector3 _Position, Vector3 _Rotation, Vector3 _Color, float _Radius) : IObject
     {
         public Vector3 Position { get; set; } = _Position;
 

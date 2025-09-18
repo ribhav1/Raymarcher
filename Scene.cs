@@ -88,6 +88,7 @@ namespace RayMarch
             int[] typeArray = new int[MAX_OBJS];
             float[] sphereRadiiArray = new float[MAX_OBJS];
             Vector3[] boxSizeArray = new Vector3[MAX_OBJS];
+            Vector2[] torusRadiiArray = new Vector2[MAX_OBJS];
             OpenTK.Mathematics.Matrix3[] rotInvArray = new OpenTK.Mathematics.Matrix3[MAX_OBJS];
 
             for (int i = 0; i < _objects.Count; i++)
@@ -98,9 +99,10 @@ namespace RayMarch
                 typeArray[i] = _objects[i].Type;
                 rotInvArray[i] = Shader.CalculateInverseRotationMatrix((OpenTK.Mathematics.Vector3)_objects[i].Rotation);
 
-                if (_objects[i] is Sphere sphere) sphereRadiiArray[i] = sphere.Radius;
-                if (_objects[i] is Light light) sphereRadiiArray[i] = light.Radius;
-                if (_objects[i] is Box box) boxSizeArray[i] = box.Size;
+                if (_objects[i] is Sphere sphere) { sphereRadiiArray[i] = sphere.Radius; }
+                else if (_objects[i] is Light light) { sphereRadiiArray[i] = light.Radius; }
+                else if (_objects[i] is Box box) { boxSizeArray[i] = box.Size; }
+                else if (_objects[i] is Torus torus) { torusRadiiArray[i] = new Vector2(torus.RadiusToroidal, torus.RadiusPoloidal); }
             }
 
             shader.SetMatrix3Array("objInvRotMat", rotInvArray, _objects.Count);
@@ -112,6 +114,7 @@ namespace RayMarch
 
             GL.Uniform1(GL.GetUniformLocation(shader.Handle, "sphereRadii"), _objects.Count, ref sphereRadiiArray[0]);
             GL.Uniform3(GL.GetUniformLocation(shader.Handle, "boxSizes"), _objects.Count, ref boxSizeArray[0].X);
+            GL.Uniform2(GL.GetUniformLocation(shader.Handle, "torusRadii"), _objects.Count, ref torusRadiiArray[0].X);
 
             SunDirection = new Vector3(0.3f, 0.7f, 0.0f);
             shader.SetVector3("sunDir", SunDirection.X, SunDirection.Y, SunDirection.Z);
