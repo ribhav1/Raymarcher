@@ -62,7 +62,8 @@ namespace RayMarch
                 new Sphere(Vector3.Zero, Vector3.Zero, new Vector4(0.1f, 1, 1, 1), 0.2f, 1f),
                 new Box(new Vector3(0f, -5f, 0f), new Vector3(0,0,0), new Vector4(0.1f, 0.1f, 1f, 1f), 0.2f, new Vector3(10f, 0.1f, 10f)),
                 //new Light(new Vector3(0, 10, 0), new Vector3(1, 1, 1), 1f),
-                new Torus(new Vector3(-3f, 0f, 0f), Vector3.Zero, new Vector4(1f, 0.1f, 1, 1), 0.5f, 1.5f, 0.25f),
+                new Torus(new Vector3(-3f, 0f, 0f), Vector3.Zero, new Vector4(1f, 0.1f, 1, 1), 0.2f, 1.5f, 0.25f),
+                new Capsule(new Vector3(5f, 0f, 0f), Vector3.Zero, new Vector4(1f, 1f, 0.1f, 1), 0.2f, 0.5f, 2f)
 
             });
             _currentScene.SetUpdate(DemoSceneUpdate);
@@ -289,6 +290,7 @@ namespace RayMarch
             _currentScene.Objects[4].Position = new Vector3(-3 * (float)Math.Cos(time + 0.75), -3 * (float)Math.Sin(time + 0.75), _currentScene.Objects[4].Position.Z);
             _currentScene.Objects[5].AngularVelocity = new Vector3(0, 1, 0);
             _currentScene.Objects[6].Rotation = new Vector3((float)Math.Sin(time * 3) *0.25f, 0, (float)Math.Cos(time * 3) * 0.25f);
+            _currentScene.Objects[7].AngularVelocity = new Vector3(1, 0, 0);
         }
 
     }
