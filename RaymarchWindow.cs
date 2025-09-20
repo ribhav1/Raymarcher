@@ -25,7 +25,7 @@ namespace RayMarch
         private bool _inScene = false;
         
         private int currentItem = 0;
-        private string[] objectTypes = new string[] { "Sphere", "Box", "Light", "Torus" };
+        private string[] objectTypes = new string[] { "Sphere", "Box", "Light", "Torus", "Capsule" };
 
         private Vector3 posText = Vector3.Zero;
         private Vector3 rotText = Vector3.Zero;
@@ -35,6 +35,7 @@ namespace RayMarch
         private Vector3 sizeText = Vector3.Zero;
         private float radToroidalText = 0;
         private float radPoloidalText = 0;
+        private float heightText = 0;
 
         public RaymarchWindow(GameWindowSettings gws, NativeWindowSettings nws) : base(gws, nws) { /*CursorState = CursorState.Grabbed;*/ }
 
@@ -61,7 +62,6 @@ namespace RayMarch
                 new Sphere(Vector3.Zero, Vector3.Zero, new Vector4(1, 1, 0.1f, 1), 0.2f, 1f),
                 new Sphere(Vector3.Zero, Vector3.Zero, new Vector4(0.1f, 1, 1, 1), 0.2f, 1f),
                 new Box(new Vector3(0f, -5f, 0f), new Vector3(0,0,0), new Vector4(0.1f, 0.1f, 1f, 1f), 0.2f, new Vector3(10f, 0.1f, 10f)),
-                //new Light(new Vector3(0, 10, 0), new Vector3(1, 1, 1), 1f),
                 new Torus(new Vector3(-3f, 0f, 0f), Vector3.Zero, new Vector4(1f, 0.1f, 1, 1), 0.2f, 1.5f, 0.25f),
                 new Capsule(new Vector3(5f, 0f, 0f), Vector3.Zero, new Vector4(1f, 1f, 0.1f, 1), 0.2f, 0.5f, 2f)
 
@@ -137,10 +137,10 @@ namespace RayMarch
             {
                 if (ImGui.BeginMenu("File"))
                 {
-                    if (ImGui.MenuItem("New")) { }
+                    if (ImGui.MenuItem("New")) { _currentScene = new Scene(); }
                     if (ImGui.MenuItem("Open")) { }
                     if (ImGui.MenuItem("Save")) { }
-                    if (ImGui.MenuItem("Exit")) { }
+                    if (ImGui.MenuItem("Exit")) { Close(); }
                     ImGui.EndMenu();
                 }
 
@@ -247,6 +247,10 @@ namespace RayMarch
                                 ImGui.InputFloat("Toroidal Radius", ref radToroidalText, 1f);
                                 ImGui.InputFloat("Poloidal Radius", ref radPoloidalText, 1f);
                                 break;
+                            case "Capsule":
+                                ImGui.InputFloat("Radius", ref radText, 1f);
+                                ImGui.InputFloat("Height", ref heightText, 1f);
+                                break;
                         }
 
                         if (ImGui.Button("Add"))
@@ -266,6 +270,9 @@ namespace RayMarch
                                 case "Torus":
                                     addObject = new Torus(posText, rotText, colText, reflText, radToroidalText, radPoloidalText);
                                     break;
+                                case "Capsule":
+                                    addObject = new Capsule(posText, rotText, colText, reflText, radText, heightText);
+                                    break;
                             }
 
                             if (addObject != null) _currentScene.AddObject(addObject);
@@ -283,7 +290,7 @@ namespace RayMarch
 
         void DemoSceneUpdate(double time)
         {
-            if (_currentScene.Objects.Count < 7) return;
+            if (_currentScene.Objects.Count < 8) return;
             _currentScene.Objects[1].Position = new Vector3(3 * (float)Math.Cos(time + 0.75), 3 * (float)Math.Sin(time + 0.75), _currentScene.Objects[1].Position.Z);
             _currentScene.Objects[2].Position = new Vector3(-3 * (float)Math.Cos(time - 0.75), -3 * (float)Math.Sin(time - 0.75), _currentScene.Objects[2].Position.Z);
             _currentScene.Objects[3].Position = new Vector3(3 * (float)Math.Cos(time - 0.75), 3 * (float)Math.Sin(time - 0.75), _currentScene.Objects[3].Position.Z);
