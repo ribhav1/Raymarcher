@@ -23,7 +23,7 @@ Raymarcher is a C# application that demonstrates real-time rendering with signed
 
 - **Camera System** - First-person camera with smooth movement and mouse look
 - **Real-time Editor Interface** - ImGui-powered scene controls and parameter 
-- **Multiple Primitive Support** - Spheres, boxes, and lights with full transformation support
+- **Multiple Primitive Support** - Spheres, boxes, toruses, capsules, and lights with full transformation support
 - **Advanced Lighting Model** - Diffuse and specular Blinn-Phong shading
 - **Rotation Support** - Full 3D rotations for box primitives using inverse rotation matrices
 
