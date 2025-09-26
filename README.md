@@ -20,9 +20,9 @@ Raymarcher is a C# application that demonstrates real-time rendering with signed
 
 ## Key Features
 
-
+- **Real-time Editor Interface** - ImGui-powered scene controls and parameter
+- **Saving/Loading Scenes System** - Save and load custom scenes, as well as the demo scene
 - **Camera System** - First-person camera with smooth movement and mouse look
-- **Real-time Editor Interface** - ImGui-powered scene controls and parameter 
 - **Multiple Primitive Support** - Spheres, boxes, toruses, capsules, and lights with full transformation support
 - **Advanced Lighting Model** - Diffuse and specular Blinn-Phong shading
 - **Rotation Support** - Full 3D rotations for box primitives using inverse rotation matrices
@@ -56,6 +56,7 @@ The engine implements a sophisticated multi-bounce raymarching pipeline:
 - `Scene.cs` - Object management and shader data upload
 - `Camera.cs` - First-person camera with input handling
 - `Objects/` - Geometric primitive implementations (Sphere, Box, Light)
+- `SaveLoader.cs` - Scene saving and loading management
 
 **User Interface**
 - `ImGuiController.cs` - ImGui integration for OpenTK
@@ -67,9 +68,11 @@ The engine implements a sophisticated multi-bounce raymarching pipeline:
 RayMarch/
 ├── Objects/
 │   ├── Box.cs                    # Box primitive
+│   ├── Capsule.cs                # Vertical Capsule primitive
 │   ├── Light.cs                  # Light implementation
 │   ├── Object.cs                 # Base object interface
-│   └── Sphere.cs                 # Sphere primitive
+│   ├── Sphere.cs                 # Sphere primitive
+│   └── Torus.cs                  # Torus primitive
 ├── Shaders/
 │   ├── Raymarch.frag             # Core raymarching fragment shader
 │   └── Raymarch.vert             # Vertex shader for full-screen quad
@@ -78,6 +81,7 @@ RayMarch/
 ├── Program.cs                    # Application entry point
 ├── RaymarchWindow.cs             # Main window and render loop
 ├── RenderQuad.cs                 # Full-screen rendering quad
+├── SaveLoader.cs                 # Helper for saving and loading scenes
 ├── Scene.cs                      # Scene management and object handling
 └── Shader.cs                     # OpenGL shader wrapper
 ```
