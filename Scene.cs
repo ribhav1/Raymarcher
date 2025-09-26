@@ -4,7 +4,7 @@ using RayMarch.Objects;
 
 namespace RayMarch
 {
-    class Scene
+    public class Scene
     {
         private const int MAX_OBJS = 32;
         private readonly List<IObject> _objects;

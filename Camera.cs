@@ -1,6 +1,5 @@
 ﻿using System.Numerics;
 using OpenTK.Windowing.GraphicsLibraryFramework;
-using System;
 
 namespace RayMarch
 {
@@ -45,12 +44,12 @@ namespace RayMarch
 
             // keyboard movement
             Vector3 move = Vector3.Zero;
-            if (keys.IsKeyDown(Keys.W)) move += Forward;
-            if (keys.IsKeyDown(Keys.S)) move -= Forward;
-            if (keys.IsKeyDown(Keys.D)) move += Right;
-            if (keys.IsKeyDown(Keys.A)) move -= Right;
-            if (keys.IsKeyDown(Keys.Space)) move += Vector3.UnitY;
-            if (keys.IsKeyDown(Keys.LeftShift)) move -= Vector3.UnitY;
+            if (keys.IsKeyDown(OpenTK.Windowing.GraphicsLibraryFramework.Keys.W)) move += Forward;
+            if (keys.IsKeyDown(OpenTK.Windowing.GraphicsLibraryFramework.Keys.S)) move -= Forward;
+            if (keys.IsKeyDown(OpenTK.Windowing.GraphicsLibraryFramework.Keys.D)) move += Right;
+            if (keys.IsKeyDown(OpenTK.Windowing.GraphicsLibraryFramework.Keys.A)) move -= Right;
+            if (keys.IsKeyDown(OpenTK.Windowing.GraphicsLibraryFramework.Keys.Space)) move += Vector3.UnitY;
+            if (keys.IsKeyDown(OpenTK.Windowing.GraphicsLibraryFramework.Keys.LeftShift)) move -= Vector3.UnitY;
 
             if (move.LengthSquared() > 0)
                 move = Vector3.Normalize(move) * Speed * deltaTime;

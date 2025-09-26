@@ -5,6 +5,7 @@ namespace RayMarch
 {
     class Program
     {
+        [STAThread]
         static void Main()
         {
             var native = new NativeWindowSettings

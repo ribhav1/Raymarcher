@@ -8,7 +8,7 @@ namespace RayMarch.Objects
     {
         public Vector3 Position { get; set; } = _Position;
 
-        public Vector3 Rotation { get; set; } = Vector3.Zero;
+        public Vector3 Rotation { get; set; } = _Rotation;
 
         public Vector3 LinearVelocity { get; set; } = Vector3.Zero;
 

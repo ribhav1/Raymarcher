@@ -4,7 +4,7 @@ using System;
 
 namespace RayMarch
 {
-    class Shader
+    public class Shader
     {
         public int Handle { get; private set; }
 

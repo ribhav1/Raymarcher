@@ -18,6 +18,8 @@ namespace RayMarch
         private Camera _camera;
         private ImGuiController _imgui;
 
+        private Scene _demoScene;
+
         private bool _showSceneControls = true;
         private bool _showPerformance = true;
         private bool _showCamera = true;
@@ -54,7 +56,7 @@ namespace RayMarch
             _raymarchShader = new Shader(File.ReadAllText("Shaders/Raymarch.vert"), File.ReadAllText("Shaders/Raymarch.frag"));
             _quad = new RenderQuad();
             // setting it up like this to allow for scene switching in the future
-            _currentScene = new Scene(new List<IObject>
+            _demoScene = new Scene(new List<IObject>
             {
                 new Sphere(Vector3.Zero, Vector3.Zero, new Vector4(1,0.1f,0.1f,1), 0.9f, 1f),
                 new Sphere(Vector3.Zero, Vector3.Zero, new Vector4(0.1f, 1f, 0.1f, 1), 0.2f, 1f),
@@ -66,7 +68,8 @@ namespace RayMarch
                 new Capsule(new Vector3(5f, 0f, 0f), Vector3.Zero, new Vector4(1f, 1f, 0.1f, 1), 0.2f, 0.5f, 2f)
 
             });
-            _currentScene.SetUpdate(DemoSceneUpdate);
+            _demoScene.SetUpdate(DemoSceneUpdate);
+            _currentScene = _demoScene;
             _timer = Stopwatch.StartNew();
             _camera = new Camera();
         }
@@ -138,8 +141,13 @@ namespace RayMarch
                 if (ImGui.BeginMenu("File"))
                 {
                     if (ImGui.MenuItem("New")) { _currentScene = new Scene(); }
-                    if (ImGui.MenuItem("Open")) { }
-                    if (ImGui.MenuItem("Save")) { }
+                    if (ImGui.BeginMenu("Open")) 
+                    { 
+                        if (ImGui.MenuItem("From Files")) { _currentScene = SaveLoader.LoadSceneFromFies() ?? _currentScene; }
+                        if (ImGui.MenuItem("Demo")) { _currentScene = _demoScene; }
+                        ImGui.EndMenu();
+                    }
+                    if (ImGui.MenuItem("Save")) { SaveLoader.SaveCurrentScene(_currentScene); }
                     if (ImGui.MenuItem("Exit")) { Close(); }
                     ImGui.EndMenu();
                 }

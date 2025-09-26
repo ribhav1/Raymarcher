@@ -59,12 +59,12 @@ namespace RayMarch
             io.MousePos = new System.Numerics.Vector2(mouse.X, mouse.Y);
 
             var keyboard  = window.KeyboardState;
-            io.AddKeyEvent(ImGuiKey.Backspace, keyboard.IsKeyDown(Keys.Backspace));
-            io.AddKeyEvent(ImGuiKey.Delete, keyboard.IsKeyDown(Keys.Delete));
-            io.AddKeyEvent(ImGuiKey.LeftArrow, keyboard.IsKeyDown(Keys.Left));
-            io.AddKeyEvent(ImGuiKey.RightArrow, keyboard.IsKeyDown(Keys.Right));
-            io.AddKeyEvent(ImGuiKey.UpArrow, keyboard.IsKeyDown(Keys.Up));
-            io.AddKeyEvent(ImGuiKey.DownArrow, keyboard.IsKeyDown(Keys.Down));
+            io.AddKeyEvent(ImGuiKey.Backspace, keyboard.IsKeyDown(OpenTK.Windowing.GraphicsLibraryFramework.Keys.Backspace));
+            io.AddKeyEvent(ImGuiKey.Delete, keyboard.IsKeyDown(OpenTK.Windowing.GraphicsLibraryFramework.Keys.Delete));
+            io.AddKeyEvent(ImGuiKey.LeftArrow, keyboard.IsKeyDown(OpenTK.Windowing.GraphicsLibraryFramework.Keys.Left));
+            io.AddKeyEvent(ImGuiKey.RightArrow, keyboard.IsKeyDown(OpenTK.Windowing.GraphicsLibraryFramework.Keys.Right));
+            io.AddKeyEvent(ImGuiKey.UpArrow, keyboard.IsKeyDown(OpenTK.Windowing.GraphicsLibraryFramework.Keys.Up));
+            io.AddKeyEvent(ImGuiKey.DownArrow, keyboard.IsKeyDown(OpenTK.Windowing.GraphicsLibraryFramework.Keys.Down));
 
             ImGui.NewFrame();
         }
